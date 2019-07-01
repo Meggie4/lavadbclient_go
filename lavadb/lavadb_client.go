@@ -229,7 +229,7 @@ TODO
  */
 func (ldb Lavadb) DelRecurse (
 	prefix			string,
-	delCount		int,
+	delCount		*int,
 	count 			int,
 	hash 			string) int {
 	return 0
