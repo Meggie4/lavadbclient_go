@@ -1,12 +1,15 @@
 package main
 
 import (
-	"./protocols"
-	"./lavadb"
 	"fmt"
+	"./protocols"
+	"math/big"
+	"net"
 	"os"
 	"strconv"
 	"strings"
+	"./lavadb"
+	"time"
 )
 
 func PrintHelpmsg(args []string) {
@@ -33,14 +36,14 @@ func main() {
 		PrintHelpmsg(args)
 		return 
 	}
-	var debug_val, tid_val, cid_val, port_val int
+	var debug_val, tid_val, cid_val, port_val int64
 	var ip_val, keyhash_val, keyhash_delimiter_val, keyrange string
 	if debug := os.Getenv("LAVADB_DEBUG"); debug != "" {
 		if mydebug, err := strconv.Atoi(debug); err == nil {
 			fmt.Println("debug error", err)
 			return
 		} else {
-			debug_val = mydebug
+			debug_val = int64(mydebug)
 		}
 	} else {
 		debug_val = 0
@@ -51,7 +54,7 @@ func main() {
 			fmt.Println("tid error", err)
 			return
 		} else {
-			tid_val = mytid
+			tid_val = int64(mytid)
 		}
 	} else {
 		tid_val = 900001
@@ -62,7 +65,7 @@ func main() {
 			fmt.Println("cid error", err)
 			return
 		} else {
-			cid_val = mycid
+			cid_val = int64(mycid)
 		}
 	} else {
 		cid_val = 15
@@ -73,7 +76,7 @@ func main() {
 			fmt.Println("port error", err)
 			return
 		} else {
-			port_val = myport
+			port_val = int64(myport)
 		}
 	} else {
 		port_val = 9090
@@ -87,7 +90,8 @@ func main() {
 		keyhash_val = "test_hash"
 	} 
 
-	if keyhash_delimiter_val := os.Getenv("LAVADB_KEYHASH_DELIMITER"); keyhash_delimiter_val == "" {
+	if keyhash_delimiter_val := os.Getenv("LAVADB_KEYHASH_DELIMITER");
+			keyhash_delimiter_val == "" {
 		keyhash_delimiter_val = "."
 	} 
 
@@ -114,60 +118,72 @@ func main() {
 		fmt.Println("----------------------------------------")
 	}
 
-	var lava lavadb_client.Lavadb
-	{
-		ip_val,
-		port_val,
-		tid_val,
-		cid_val,
+	uip := big.NewInt(0)
+	uip.SetBytes(net.ParseIP(ip_val).To4())
+	lava := lavadb_client.Lavadb {
+		Ip_:		ip_val,
+		Uip_: 		uip.Int64(),
+		Port_:  	port_val,
+		Conn_:     	nil,
+		Tid_ :   	tid_val,
+		Cid_ :      cid_val,
+		LastVisit_: time.Now(),
+		CurrVisit_: nil,
 	}
 
-	ret := 0
+	var ret int64
 	if strings.Compare(args[1], "get") == 0 {
 		if len(args) < 3 {
 			PrintHelpmsg(args)
 			return
 		}
-		var val, errmsg string 
-		rsp := lava.get(keyrange, keyhash_val)
-		if rsp == nil {
-			fmt.Printf("get %s failed, rsp is nil\n", keyrange)
+		var val string
+		var rsp = new(lavadb_protocol.RspLavaDBGetRecord)
+		var err error
+		rsp, err = lava.Get(keyrange, keyhash_val)
+		if err != nil {
+			fmt.Println("get failed,", err)
 			return
 		}
-		ret = (int)rsp.Retcode
-		if ret != 0 && ret != lavadb.E_CELL_NO_RECORD {
-			fmt.Printf("get %s failed, ret = %d, retmsg = %s\n", keyrange, ret, string(rsp.Retmsg))
+		ret = rsp.Retcode
+		if ret != 0 && ret != lavadb_client.E_CELL_NO_RECORD {
+			fmt.Printf("get %s failed, ret = %d, retmsg = %s\n",
+					keyrange, ret, string(rsp.Retmsg))
 			if ret > 0 {
 				ret = -ret
 			}
 			return
 		}
-		val = string(rsp.value)
+		val = string(rsp.Value)
 		
-		if ret == lavadb.E_CELL_NO_RECORD {
+		if ret == lavadb_client.E_CELL_NO_RECORD {
 			fmt.Println("no record")
 			return 
 		}
 		fmt.Println("val:", val)
-	} else if strings.Compare(args[1], "list") == 0 {
+		return
+	}
+	if strings.Compare(args[1], "list") == 0 {
 		if len(args) < 3 {
 			PrintHelpmsg(args)
 			return
 		}
 
-		iter := lava.list_iterator(keyrange, false, 1000, keyhash_val)
+		iter := lavadb_client.LavadbListIter{
+
+		}
 		
 		if len(args) > 3 {
-			iter.set_marker(args[3])
+			iter.SetMarker(args[3])
 		}
 
-		var r *lavadb.Record = nil
-		for iter.next(&r) > 0 {
-			range := string(r.partial_key)
-			fmt.Println("range:", range)
-		} 
-	} else if strings.Compare(args[1], "set") == 0 {
-		if debug == 0 {
+		/*
+		TODO
+		 */
+		return
+	}
+	if strings.Compare(args[1], "set") == 0 {
+		if debug_val == 0 {
 			fmt.Println("LAVADB_DEBUG not set or false")
 			return
 		}
@@ -175,48 +191,56 @@ func main() {
 			PrintHelpmsg(args)
 			return
 		}
-		var val, errmsg string 
+		var val string
+		var rsp = new(lavadb_protocol.RspLavaDBSetRecord)
 		val = args[3]
-		rsp := lava.set(keyrange, val, keyhash_val)
-		if rsp == nil {
-			fmt.Printf("set [%s]: data size[%d] failed, rsp is nil\n", keyrange, len(val))
+		var err error
+		rsp, err = lava.Set(keyrange, val, keyhash_val)
+		if err != nil {
+			fmt.Println("set failed,", err)
 			return
 		}
-		ret = (int)rsp.Retcode
+		ret = rsp.Retcode
 		if ret != 0 {
 			retmsg := string(rsp.Retmsg)
-			fmt.Printf("set [%s]: data size[%d] failed, ret = %d, retmsg = %s\n", keyrange, len(val), ret, retmsg)
+			fmt.Printf("set [%s]: data size[%d] failed, ret = %d, retmsg = %s\n",
+						keyrange, len(val), ret, retmsg)
 		}
 		
 		if ret == 0 {
 			fmt.Println("", args[3])
 		}
-	} else if strings.Compare(args[1], "del") == 0 {
-		if debug == 0 {
-			fmt.Println("LAVADB_DEBUG not set or false")
-			return
-		}
-		if len(args) < 3 {
-			PrintHelpmsg(args)
-			return
-		}
-		ret := lava.del(keyrange, keyhash_val)
-		fmt.Printf("deleted: %d\n", ret)
-	} else if strings.Compare(args[1], "delr") == 0 {
-		if debug == 0 {
-			fmt.Println("LAVADB_DEBUG not set or false")
-			return
-		}
-		if len(args) < 3 {
-			PrintHelpmsg(args)
-			return
-		}
-		ret := lava.del_recurse(keyrange, nil, 1000, keyhash_val)
-		fmt.Printf("deleted: %d\n", ret)
-	} else {
-		fmt.Printf("not support %s operation\n", args[1])
 		return
 	}
-	return 
+	if strings.Compare(args[1], "del") == 0 {
+		if debug_val == 0 {
+			fmt.Println("LAVADB_DEBUG not set or false")
+			return
+		}
+		if len(args) < 3 {
+			PrintHelpmsg(args)
+			return
+		}
+		myret := lava.Del(keyrange, keyhash_val)
+		fmt.Printf("deleted: %d\n", myret)
+		return
+	}
+
+	if strings.Compare(args[1], "delr") == 0 {
+		if debug_val == 0 {
+			fmt.Println("LAVADB_DEBUG not set or false")
+			return
+		}
+		if len(args) < 3 {
+			PrintHelpmsg(args)
+			return
+		}
+		ret := lava.DelRecurse(keyrange, nil, 1000, keyhash_val)
+		fmt.Printf("deleted: %d\n", ret)
+		return
+	}
+
+	fmt.Printf("not support %s operation\n", args[1])
+	return
 }
 
