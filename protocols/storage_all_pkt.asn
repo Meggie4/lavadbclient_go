@@ -1,0 +1,43 @@
+STORAGEALL DEFINITIONS ::= 
+BEGIN 
+
+IMPORTS 
+	OBJECTSTOREPkt
+FROM OBJECTSTORE;
+
+-- Storage��Ϣ����
+StorageMessage ::= SEQUENCE
+{
+    version INTEGER { version-1(0)},	-- �汾��
+    seq INTEGER,				-- ��Ϣ���?
+    routeinfo ROUTEINFO,		-- ·����Ϣ
+    msgtype INTEGER,            -- ��Ϣ����
+    body PKTS					-- ��Ϣ��
+}
+
+-- ·����Ϣ
+ROUTEINFO ::= SEQUENCE
+{
+    version INTEGER { version-1(0)},	-- �汾�� 
+    srcid INTEGER,			-- Դ���ID
+	
+	destkey INTEGER,		-- Ŀ�Ľ��key
+	destid INTEGER,			-- Ŀ�Ľ��id
+	desttype INTEGER,		-- Ŀ������0 by_key, 1 by_destid
+    
+	remoteip  INTEGER,		-- �Զ�ip
+	remoteport INTEGER,		-- �Զ�port
+	remoteid  INTEGER,  	-- �Զ�id
+	remotetype INTEGER		-- �Զ�����0 by_ip, 1 by_id
+
+
+
+}
+
+PKTS ::= CHOICE
+{
+	[30000] OBJECTSTOREPkt
+}
+
+END
+

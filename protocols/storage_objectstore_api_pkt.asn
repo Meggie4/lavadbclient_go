@@ -1,0 +1,321 @@
+OBJECTSTORE DEFINITIONS ::=
+BEGIN
+
+EXPORTS
+	OBJECTSTOREPkt;
+	
+OBJECTSTOREPkt ::= SEQUENCE
+{
+	version INTEGER { version-1(0)}, -- version
+	echodata OCTET STRING,           -- ext property
+	body OBJECTSTORESubPKT                   -- message body
+}
+
+-- OBJECTSTORE Message
+OBJECTSTORESubPKT ::= CHOICE
+{
+	-- LavaDB interface invoked by preupload and http -- 
+	[2000] ReqLavaDBSetRecord,
+	[2001] RspLavaDBSetRecord,
+	
+	[2010] ReqLavaDBGetRecord,
+	[2011] RspLavaDBGetRecord, 
+	
+	[2020] ReqLavaDBDelRecord,
+	[2021] RspLavaDBDelRecord,
+
+	[4016] ReqLavaDBHeartBeat,
+	[4017] RspLavaDBHeartBeat,
+
+	[8100] ReqLavaDBListRecord,
+	[8101] RspLavaDBListRecord,
+	
+	[8102] ReqLavaDBSetVerRecord,
+	[8103] RspLavaDBSetVerRecord,
+	
+	[8104] ReqLavaDBDelVerRecord,
+	[8105] RspLavaDBDelVerRecord,
+	
+	[8106] ReqLavaDBListRecordWithEndMarker,
+	[8107] RspLavaDBListRecordWithEndMarker,
+	
+	-- TFSProxy interface invoked by preupload and http -- 
+	[8200] ReqTFSUploadData,
+	[8201] RspTFSUploadData,
+	
+	[8202] ReqTFSDownloadData,
+	[8203] RspTFSDownloadData,
+	
+	[8204] ReqTFSDeleteData,
+	[8205] RspTFSDeleteData,
+	
+	[8206] ReqTFSHeartBeat,
+	[8207] RspTFSHeartBeat,
+
+	[8208] ReqTFSRefreshCfg,
+	[8209] RspTFSRefreshCfg
+}
+
+-----------------------
+-- OBJECTSTORE LavaDB
+-----------------------
+ReqLavaDBSetRecord ::= SEQUENCE
+{
+	dbid            INTEGER,
+	tableid         INTEGER,
+	key-hash        OCTET STRING,   -- 业务的hashkey，OBJECTSTORE根据该值将多个业务打散存储，防止热点
+	key-range       OCTET STRING,   -- 实际的业务key = key-hash + key-range，详见例子
+	value           OCTET STRING,
+	timetolive      INTEGER         -- 过期删除标记，0表示不用
+}
+
+RspLavaDBSetRecord ::= SEQUENCE     --使用场景: 写分片索引
+{
+	retcode         INTEGER,
+	retmsg          OCTET STRING,
+	ver             OCTET STRING,	-- string ,写成功时，新数据版本号
+	key-hash		OCTET STRING,   -- 返回请求参数key-hash
+	key-range		OCTET STRING    -- 返回请求参数key-range
+}
+
+ReqLavaDBSetVerRecord ::= SEQUENCE   --使用场景: 写/改文件索引, 写/改目录索引
+{
+	dbid            INTEGER,
+	tableid         INTEGER,
+	key-hash		OCTET STRING,
+	key-range		OCTET STRING,
+	value           OCTET STRING,
+	ver             OCTET STRING,  -- string 型版本号,CAS写当前版本号，
+	add-flag        INTEGER,	   -- 1：【新增记录：记录不存在时，CAS比较通过；记录存在时CAS失败】
+							       -- 0：【CAS修改：记录不存在时，CAS失败；记录存在时比较ver】
+	timetolive		INTEGER        -- 0：表示不用
+}
+
+RspLavaDBSetVerRecord ::= SEQUENCE
+{
+	retcode INTEGER,
+	retmsg 	OCTET STRING,
+	ver 	OCTET STRING,  	       -- string ,写成功时，新数据版本号
+	key-hash		OCTET STRING,
+	key-range		OCTET STRING
+}
+
+ReqLavaDBGetRecord ::= SEQUENCE
+{
+	dbid            INTEGER,
+	tableid         INTEGER,
+	key-hash        OCTET STRING,
+	key-range       OCTET STRING
+}
+
+RspLavaDBGetRecord ::= SEQUENCE
+{
+	retcode         INTEGER,
+	retmsg          OCTET STRING,
+	value           OCTET STRING,
+	ver             OCTET STRING,
+	key-hash		OCTET STRING,
+	key-range		OCTET STRING
+}
+
+ReqLavaDBListRecord ::= SEQUENCE
+{
+   dbid             INTEGER,
+   tableid          INTEGER,
+   key-hash         OCTET STRING,
+   prefix           OCTET STRING,     -- 前缀，如果prefix本身存在，需要返回
+   delimiter        OCTET STRING,     -- 目录分隔符
+   marker           OCTET STRING,     -- 未分割的起始key(不包含marker)
+   value-offset     INTEGER,          -- value的读取偏移 
+   value-size       INTEGER,          -- value的读取大小 -1 表示返回offset后面所有的数据
+                                      -- offset = 0 , size = -1 ,表示返回整个value 
+   maxnum           INTEGER,          -- 列表数目
+   type             INTEGER           -- 需要的返回类型 0 - 只返回key列表， 1 - 每个value
+                                      -- 都返回从offset开始的size个字节
+}
+
+ReqLavaDBListRecordWithEndMarker ::= SEQUENCE
+{
+   dbid             INTEGER,
+   tableid          INTEGER,
+   key-hash         OCTET STRING,
+   prefix           OCTET STRING,     -- 前缀锟斤拷锟斤拷锟絧refix锟斤拷锟斤拷锟斤拷冢锟斤拷锟揭拷锟斤拷锟�
+   delimiter        OCTET STRING,     -- 目录锟街革拷锟斤拷
+   marker           OCTET STRING,     -- 未锟街革拷锟斤拷锟绞糼ey(锟斤拷锟斤拷锟斤拷marker)
+   end-marker		OCTET STRING,     -- 锟斤拷锟斤拷key(锟斤拷锟斤拷锟斤拷)
+   value-offset     INTEGER,          -- value锟侥讹拷取偏锟斤拷 
+   value-size       INTEGER,          -- value锟侥讹拷取锟斤拷小 -1 锟斤拷示锟斤拷锟斤拷offset锟斤拷锟斤拷锟斤拷锟叫碉拷锟斤拷锟斤拷
+                                      -- offset = 0 , size = -1 ,锟斤拷示锟斤拷锟斤拷锟斤拷锟斤拷value 
+   maxnum           INTEGER,          -- 锟叫憋拷锟斤拷目
+   type             INTEGER           -- 锟斤拷要锟侥凤拷锟斤拷锟斤拷锟斤拷 0 - 只锟斤拷锟斤拷key锟叫憋拷 1 - 每锟斤拷value
+                                      -- 锟斤拷锟斤拷锟截达拷offset锟斤拷始锟斤拷size锟斤拷锟街斤拷
+}
+
+Record ::= SEQUENCE
+{
+	key-hash        OCTET STRING,
+	partial-key     OCTET STRING,	  -- prefix之后的部分
+	value           OCTET STRING,
+	ver             OCTET STRING
+}
+
+RecordList ::= SEQUENCE OF Record
+
+RspLavaDBListRecord ::= SEQUENCE
+{
+	retcode         INTEGER,
+	retmsg          OCTET STRING,
+	record-list     RecordList,       -- 带版本号的记录列表
+	prefix          OCTET STRING,     -- 带回请求里的prefix
+    marker          OCTET STRING,     -- 请求中的marker
+	next-marker     OCTET STRING,     -- 下一次 list的起始key（不包含）;
+	is-truncate     INTEGER           -- 0: List结束
+	                                  -- 1: List未结束,需要继续List才能拉完其他的列表
+}
+
+RspLavaDBListRecordWithEndMarker ::= SEQUENCE
+{
+	retcode         INTEGER,
+	retmsg          OCTET STRING,
+	record-list     RecordList,       -- 锟斤拷锟芥本锟脚的硷拷录锟叫憋拷
+	prefix          OCTET STRING,     -- 锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟絧refix
+    marker          OCTET STRING,     -- 锟斤拷锟斤拷锟叫碉拷marker
+    end-marker      OCTET STRING,     -- 锟斤拷锟斤拷锟叫碉拷end-marker
+	next-marker     OCTET STRING,     -- 锟斤拷一锟斤拷 list锟斤拷锟斤拷始key锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷;
+	is-truncate     INTEGER           -- 0: List锟斤拷锟斤拷
+	                                  -- 1: List未锟斤拷锟斤拷,锟斤拷要锟斤拷锟斤拷List锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟叫憋拷
+}
+
+ReqLavaDBDelRecord ::= SEQUENCE
+{
+	dbid            INTEGER,
+	tableid         INTEGER,
+	key-hash        OCTET STRING,
+	key-range       OCTET STRING
+}
+
+RspLavaDBDelRecord ::= SEQUENCE
+{
+	retcode         INTEGER,
+	retmsg          OCTET STRING,
+	key-hash        OCTET STRING,
+	key-range       OCTET STRING
+}
+
+ReqLavaDBDelVerRecord ::= SEQUENCE   
+{
+	dbid 			INTEGER,
+	tableid 		INTEGER,
+	key-hash		OCTET STRING,
+	key-range		OCTET STRING,
+	ver     		OCTET STRING
+}
+
+RspLavaDBDelVerRecord ::= SEQUENCE   -- 删除的时候，不做读操作，所以不返回当前的版本号
+{
+	retcode INTEGER,
+	retmsg 	OCTET STRING,
+	key-hash		OCTET STRING,
+	key-range		OCTET STRING
+}
+
+ReqLavaDBHeartBeat ::= SEQUENCE
+{
+	seq INTEGER
+}
+
+RspLavaDBHeartBeat ::= SEQUENCE
+{
+	retcode INTEGER,
+	seq INTEGER,
+	ver1 INTEGER,
+	ver2 INTEGER,
+	ver3 INTEGER,
+	starttime INTEGER,
+	resv OCTET STRING
+}
+
+-----------------------
+-- OBJECTSTORE TFSProxy
+-----------------------
+ReqTFSHeartBeat ::= SEQUENCE
+{
+	seq     INTEGER
+}
+
+RspTFSHeartBeat ::= SEQUENCE
+{
+	retcode     INTEGER, 
+	seq     INTEGER, 
+	ver1    INTEGER, 
+	ver2    INTEGER, 
+	ver3    INTEGER, 
+	starttime   INTEGER 
+}
+
+ReqTFSUploadData ::= SEQUENCE
+{
+	size INTEGER,
+	data OCTET STRING,
+	expdeltime INTEGER OPTIONAL,
+    ieee-crc32 [1] INTEGER OPTIONAL,       --客户端填写的上传数据的crc32，填了chxd会进行比较，比较不通过上传失败
+    is-return-crc32 [2] INTEGER OPTIONAL,  --是否需要返回上传数据的crc32，0或者不填表示不返回，1表示返回
+    file-key [3] OCTET STRING OPTIONAL     --分块所在文件的标识信息，仅仅用于对帐，选填，填请填可见字符
+}
+
+RspTFSUploadData ::= SEQUENCE
+{
+	retcode INTEGER,
+	size INTEGER,
+	chid INTEGER,
+	fid INTEGER,
+    ieee-crc32 INTEGER OPTIONAL     --chxd计算的上传数据的crc32
+}
+
+ReqTFSDownloadData ::= SEQUENCE
+{
+	chid INTEGER,
+	fid INTEGER,
+	offset INTEGER,
+	size   INTEGER,
+    file-key OCTET STRING OPTIONAL  --分块所在文件的标识信息，仅仅用于对帐，选填，填请填可见字符
+}
+
+RspTFSDownloadData ::= SEQUENCE
+{
+	retcode INTEGER,
+	chid INTEGER,
+	fid INTEGER,
+	offset INTEGER,
+	size INTEGER,
+	data OCTET STRING
+}
+
+ReqTFSDeleteData ::= SEQUENCE
+{
+	chid INTEGER,
+	fid INTEGER,
+    file-key OCTET STRING OPTIONAL  --分块所在文件的标识信息，仅仅用于对帐，选填，填请填可见字符
+}
+
+RspTFSDeleteData ::= SEQUENCE
+{
+	retcode INTEGER,
+	chid INTEGER,
+	fid INTEGER
+}
+
+
+ReqTFSRefreshCfg ::= SEQUENCE
+{
+	cfgfile		OCTET STRING, 
+	cfgcontent	OCTET STRING
+}
+
+RspTFSRefreshCfg ::= SEQUENCE
+{
+	retcode 	INTEGER,
+	retmsg		OCTET STRING
+}
+
+END
