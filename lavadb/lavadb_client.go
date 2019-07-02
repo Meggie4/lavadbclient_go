@@ -92,48 +92,48 @@ func (ldb Lavadb) DoRequest(
 
 	//log.Printf("rsp:%v", rspMsg)
 
-	pkt, ok := reqMsg.Body.(lavadb_protocol.OBJECTSTOREPkt)
-	if ok == false {
-		log.Println("get pkt failed")
-	}
+	//pkt, ok := reqMsg.Body.(lavadb_protocol.OBJECTSTOREPkt)
+	//if ok == false {
+	//	log.Println("get pkt failed")
+	//}
 
-	//setRecord, ok := pkt.Body.(lavadb_protocol.RspLavaDBSetRecord)
-	setRecord, ok := pkt.Body.(lavadb_protocol.ReqLavaDBSetRecord)
-	if ok == false {
-		log.Println("get reqlavadb setrecord failed")
-	}
+	////setRecord, ok := pkt.Body.(lavadb_protocol.RspLavaDBSetRecord)
+	//setRecord, ok := pkt.Body.(lavadb_protocol.ReqLavaDBSetRecord)
+	//if ok == false {
+	//	log.Println("get reqlavadb setrecord failed")
+	//}
 
-	log.Println("print storage message:")
-	log.Println("version is:", reqMsg.Version)
-	log.Println("Seq is:", reqMsg.Seq)
-	log.Println("RouteInfo is: {")
-	route := reqMsg.Routeinfo
-	log.Println("Version is", route.Version)
-	log.Println("Srcid is", route.Srcid)
-	log.Println("Destkey is", route.Destkey)
-	log.Println("Destid is", route.Destid)
-	log.Println("Desttype is", route.Desttype)
-	log.Println("Remoteip is", route.Remoteip)
-	log.Println("Remoteport is", route.Remoteport)
-	log.Println("Remoteid is", route.Remoteid)
-	log.Println("Remotetype is", route.Remotetype)
-	log.Println("}")
-	log.Println("MsgType is:", reqMsg.Msgtype)
-	log.Println("OBJECTSTOREPkt is: {")
-	log.Println("Version is", pkt.Version)
-	log.Println("Echodata is", pkt.Echodata)
-	log.Println("ReqLavaDBSetRecord is: {")
-	log.Println("Dbid is", setRecord.Dbid)
-	log.Println("Tableid is", setRecord.Tableid)
-	log.Println("Key_hash is", setRecord.Key_hash)
-	log.Println("Key_range is", setRecord.Key_range)
-	log.Println("Value is", setRecord.Value)
-	log.Println("Timetolive is", setRecord.Timetolive)
-	log.Println("}")
-	log.Println("}")
-	log.Printf("set keyhash is %s, keyrange is %s\n",
-		string(setRecord.Key_hash),
-		string(setRecord.Key_range))
+	//log.Println("print storage message:")
+	//log.Println("version is:", reqMsg.Version)
+	//log.Println("Seq is:", reqMsg.Seq)
+	//log.Println("RouteInfo is: {")
+	//route := reqMsg.Routeinfo
+	//log.Println("Version is", route.Version)
+	//log.Println("Srcid is", route.Srcid)
+	//log.Println("Destkey is", route.Destkey)
+	//log.Println("Destid is", route.Destid)
+	//log.Println("Desttype is", route.Desttype)
+	//log.Println("Remoteip is", route.Remoteip)
+	//log.Println("Remoteport is", route.Remoteport)
+	//log.Println("Remoteid is", route.Remoteid)
+	//log.Println("Remotetype is", route.Remotetype)
+	//log.Println("}")
+	//log.Println("MsgType is:", reqMsg.Msgtype)
+	//log.Println("OBJECTSTOREPkt is: {")
+	//log.Println("Version is", pkt.Version)
+	//log.Println("Echodata is", pkt.Echodata)
+	//log.Println("ReqLavaDBSetRecord is: {")
+	//log.Println("Dbid is", setRecord.Dbid)
+	//log.Println("Tableid is", setRecord.Tableid)
+	//log.Println("Key_hash is", setRecord.Key_hash)
+	//log.Println("Key_range is", setRecord.Key_range)
+	//log.Println("Value is", setRecord.Value)
+	//log.Println("Timetolive is", setRecord.Timetolive)
+	//log.Println("}")
+	//log.Println("}")
+	//log.Printf("set keyhash is %s, keyrange is %s\n",
+	//	string(setRecord.Key_hash),
+	//	string(setRecord.Key_range))
 
 	writecount, writeerr := ldb.Conn_.Write(writebuf)
 	if writeerr != nil {
@@ -174,6 +174,8 @@ func (ldb Lavadb) Set (
 
 	ret := ldb.DoRequest(reqMsg, &rspMsg)
 
+	rsp = new(lavadb_protocol.RspLavaDBSetRecord)
+
 	if ret < 0 {
 		*rsp = lavadb_protocol.RspLavaDBSetRecord{}
 		err = errors.New("ret < 0")
@@ -213,11 +215,12 @@ func (ldb Lavadb) Get (
 	keyRange		string,
 	hash 			string) (rsp *lavadb_protocol.RspLavaDBGetRecord, err error) {
 	var reqMsg, rspMsg lavadb_protocol.StorageMessage
-	seq := rand.Int63()
+	seq := (int64)(rand.Int31())
 	lavadb_protocol.GetReqLavaDBGetRecord(&reqMsg, seq, 0,
 									ldb.Uip_, ldb.Port_, ldb.Tid_,
 									ldb.Cid_, []byte(hash), []byte(keyRange))
 	ret := ldb.DoRequest(reqMsg, &rspMsg)
+	rsp = new(lavadb_protocol.RspLavaDBGetRecord)
 	if ret < 0 {
 		*rsp = lavadb_protocol.RspLavaDBGetRecord{}
 		err = errors.New("do request failed")
@@ -247,7 +250,7 @@ func (ldb Lavadb) Del (
 	keyRange		string,
 	hash 			string) int {
 	var reqMsg, rspMsg lavadb_protocol.StorageMessage
-	seq := rand.Int63()
+	seq := (int64)(rand.Int31())
 	lavadb_protocol.GetReqLavaDBDelRecord(&reqMsg, seq, 0,
 		ldb.Uip_, ldb.Port_, ldb.Tid_,
 		ldb.Cid_, []byte(hash), []byte(keyRange))
@@ -297,13 +300,14 @@ func (ldb Lavadb) List (
 	count 		int64,
 	hash 		string) (rsp *lavadb_protocol.RspLavaDBListRecord, err error) {
 	var reqMsg, rspMsg lavadb_protocol.StorageMessage
-	seq := rand.Int63()
+	seq := (int64)(rand.Int31())
 	lavadb_protocol.GetReqLavaDBListRecord(&reqMsg, seq, 0,
 										ldb.Uip_, ldb.Port_, ldb.Tid_,
 										ldb.Cid_, []byte(hash), []byte(prefix),
 										[]byte{}, []byte(nextMarker),0,
 										-1, count, needValue)
 	ret := ldb.DoRequest(reqMsg, &rspMsg)
+	rsp = new(lavadb_protocol.RspLavaDBListRecord)
 	if ret < 0 {
 		*rsp = lavadb_protocol.RspLavaDBListRecord{}
 		err = errors.New("ret < 0")
