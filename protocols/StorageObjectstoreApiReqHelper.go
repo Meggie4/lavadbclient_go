@@ -13,7 +13,7 @@ const ROUTE_DEST_KEY = 0x0001
 const ROUTE_REMOTE_ID = 0x0000
 const ROUTE_REMOTE_IPPORT = 0x0001
 
-func CheckAsnComplete(data []byte) uint64 {
+func CheckAsnComplete(data []byte) int64 {
 	len := (uint64)(len(data))
 	MAX_LEN := (uint64)(32<<10<<10)
 	if len < 4 {
@@ -44,9 +44,9 @@ func CheckAsnComplete(data []byte) uint64 {
 		if data[pkt_len] != '0' {
 			return -1
 		}
-		return pkt_len
+		return int64(pkt_len)
 	} else if len == pkt_len {
-		return pkt_len
+		return int64(pkt_len)
 	} else {
 		return 0
 	}
@@ -108,7 +108,8 @@ func GetReqLavaDBSetRecord(
 	key_range []byte,
 	value []byte) {
 	dest_key := GetSerial(key_hash, key_range)
-	route_info := GetRouteinfo(&smcd_id, nil, &dest_key, &dest_ip, &dest_port, nil)
+	route_info := GetRouteinfo(&smcd_id, nil, &dest_key,
+					&dest_ip, &dest_port, nil)
 	*out_msg = StorageMessage{
 		Version:   VERSION,
 		Seq:       msg_seq,
@@ -144,7 +145,8 @@ func GetReqLavaDBSetVerRecord(
 	ver   []byte,
 	add_flag  int64) {
 	dest_key := GetSerial(key_hash, key_range)
-	route_info := GetRouteinfo(&smcd_id, nil, &dest_key, &dest_ip, &dest_port, nil)
+	route_info := GetRouteinfo(&smcd_id, nil, &dest_key,
+					&dest_ip, &dest_port, nil)
 	*out_msg = StorageMessage{
 		Version:   VERSION,
 		Seq:       msg_seq,
@@ -179,7 +181,8 @@ func GetReqLavaDBGetRecord(
 	key_hash []byte,
 	key_range []byte) {
 	dest_key := GetSerial(key_hash, key_range)
-	route_info := GetRouteinfo(&smcd_id, nil, &dest_key, &dest_ip, &dest_port, nil)
+	route_info := GetRouteinfo(&smcd_id, nil, &dest_key,
+						&dest_ip, &dest_port, nil)
 	*out_msg = StorageMessage{
 		Version:   VERSION,
 		Seq:       msg_seq,
@@ -210,7 +213,8 @@ func GetReqLavaDBDelRecord(
 	key_hash []byte,
 	key_range []byte) {
 	dest_key := GetSerial(key_hash, key_range)
-	route_info := GetRouteinfo(&smcd_id, nil, &dest_key, &dest_ip, &dest_port, nil)
+	route_info := GetRouteinfo(&smcd_id, nil, &dest_key,
+					&dest_ip, &dest_port, nil)
 	*out_msg = StorageMessage{
 		Version:   VERSION,
 		Seq:       msg_seq,
@@ -242,7 +246,8 @@ func GetReqLavaDBDelVerRecord(
 	key_range []byte,
 	ver 	 []byte) {
 	dest_key := GetSerial(key_hash, key_range)
-	route_info := GetRouteinfo(&smcd_id, nil, &dest_key, &dest_ip, &dest_port, nil)
+	route_info := GetRouteinfo(&smcd_id, nil, &dest_key,
+				&dest_ip, &dest_port, nil)
 	*out_msg = StorageMessage{
 		Version:   VERSION,
 		Seq:       msg_seq,
@@ -280,7 +285,8 @@ func GetReqLavaDBListRecord(
 	maxnum       int64,
 	thetype      int64) {
 	dest_key := GetSerial(key_hash, prefix)
-	route_info := GetRouteinfo(&smcd_id, nil, &dest_key, &dest_ip, &dest_port, nil)
+	route_info := GetRouteinfo(&smcd_id, nil, &dest_key,
+					&dest_ip, &dest_port, nil)
 	*out_msg = StorageMessage{
 		Version:   VERSION,
 		Seq:       msg_seq,

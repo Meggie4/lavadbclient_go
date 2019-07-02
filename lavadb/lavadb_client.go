@@ -1,13 +1,13 @@
 package lavadb_client
 
 import (
-	"../protocols"
 	"errors"
 	"fmt"
 	"log"
 	"math/rand"
 	"net"
 	"time"
+	"lavadbclient_go/protocols"
 )
 
 const BUFSIZE = 2<<10<<10

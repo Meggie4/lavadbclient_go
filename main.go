@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
-	"./protocols"
+	"lavadbclient_go/lavadb"
+	"lavadbclient_go/protocols"
 	"math/big"
 	"net"
 	"os"
 	"strconv"
 	"strings"
-	"./lavadb"
 	"time"
 )
 
@@ -128,7 +128,7 @@ func main() {
 		Tid_ :   	tid_val,
 		Cid_ :      cid_val,
 		LastVisit_: time.Now(),
-		CurrVisit_: nil,
+		CurrVisit_: time.Time{},
 	}
 
 	var ret int64
