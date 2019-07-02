@@ -3,11 +3,13 @@ package lavadb_client
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"net"
-	"time"
+	"strconv"
 	"lavadbclient_go/protocols"
+	"time"
 )
 
 const BUFSIZE = 2<<10<<10
@@ -68,7 +70,8 @@ func (ldb Lavadb) DoRequest(
 	ldb.LastVisit_ = ldb.CurrVisit_
 	if ldb.Conn_ == nil {
 		var err error
-		address := ldb.Ip_ + string(ldb.Port_)
+		address := ldb.Ip_ + ":" + strconv.FormatInt(ldb.Port_,10)
+		fmt.Println("address:", address)
 		ldb.Conn_, err = net.Dial("tcp", address)
 		if err != nil {
 			log.Println("dial err:", err)
@@ -81,22 +84,75 @@ func (ldb Lavadb) DoRequest(
 		log.Println("encode failed,", err)
 		return -1
 	}
+	
+	fileerr := ioutil.WriteFile("gowrite.txt", writebuf, 0777)
+	if fileerr != nil {
+		log.Println("write file error")
+	}
+
+	//log.Printf("rsp:%v", rspMsg)
+
+	pkt, ok := reqMsg.Body.(lavadb_protocol.OBJECTSTOREPkt)
+	if ok == false {
+		log.Println("get pkt failed")
+	}
+
+	//setRecord, ok := pkt.Body.(lavadb_protocol.RspLavaDBSetRecord)
+	setRecord, ok := pkt.Body.(lavadb_protocol.ReqLavaDBSetRecord)
+	if ok == false {
+		log.Println("get reqlavadb setrecord failed")
+	}
+
+	log.Println("print storage message:")
+	log.Println("version is:", reqMsg.Version)
+	log.Println("Seq is:", reqMsg.Seq)
+	log.Println("RouteInfo is: {")
+	route := reqMsg.Routeinfo
+	log.Println("Version is", route.Version)
+	log.Println("Srcid is", route.Srcid)
+	log.Println("Destkey is", route.Destkey)
+	log.Println("Destid is", route.Destid)
+	log.Println("Desttype is", route.Desttype)
+	log.Println("Remoteip is", route.Remoteip)
+	log.Println("Remoteport is", route.Remoteport)
+	log.Println("Remoteid is", route.Remoteid)
+	log.Println("Remotetype is", route.Remotetype)
+	log.Println("}")
+	log.Println("MsgType is:", reqMsg.Msgtype)
+	log.Println("OBJECTSTOREPkt is: {")
+	log.Println("Version is", pkt.Version)
+	log.Println("Echodata is", pkt.Echodata)
+	log.Println("ReqLavaDBSetRecord is: {")
+	log.Println("Dbid is", setRecord.Dbid)
+	log.Println("Tableid is", setRecord.Tableid)
+	log.Println("Key_hash is", setRecord.Key_hash)
+	log.Println("Key_range is", setRecord.Key_range)
+	log.Println("Value is", setRecord.Value)
+	log.Println("Timetolive is", setRecord.Timetolive)
+	log.Println("}")
+	log.Println("}")
+	log.Printf("set keyhash is %s, keyrange is %s\n",
+		string(setRecord.Key_hash),
+		string(setRecord.Key_range))
+
 	writecount, writeerr := ldb.Conn_.Write(writebuf)
 	if writeerr != nil {
 		log.Println("conn write err,", writeerr)
 		return -1
 	}
-	fmt.Printf("conn write %d bytes\n", writecount)
+
+	fmt.Printf("test, conn write %d bytes\n", writecount)
+
 	readbuf := make([]byte, BUFSIZE)
 	readcount, readerr := ldb.Conn_.Read(readbuf)
 	if readerr != nil {
-		log.Println("conn read failed,", err)
+		log.Println("conn read failed,", readerr)
 		return -1
 	}
 	log.Printf("conn read %d bytes\n", readcount)
-	remainbuf, err := lavadb_protocol.Decode(readbuf, rspMsg)
-	if err != nil {
-		log.Printf("decode failed,", err)
+	remainbuf, remainerr := lavadb_protocol.Decode(readbuf, rspMsg)
+	if remainerr != nil {
+		log.Printf("decode failed,", remainerr)
 		return -1
 	} else {
 		log.Printf("after decode, remaining buf len is %d\n",
@@ -105,14 +161,13 @@ func (ldb Lavadb) DoRequest(
 	}
 }
 
-
 func (ldb Lavadb) Set (
 	keyRange		string,
 	val				string,
 	hash 			string) (rsp *lavadb_protocol.RspLavaDBSetRecord, err error){
 	var reqMsg, rspMsg lavadb_protocol.StorageMessage
 	rand.Seed(time.Now().Unix())
-	seq := rand.Int63()
+	seq := (int64)(rand.Int31())
 	lavadb_protocol.GetReqLavaDBSetRecord(&reqMsg, seq,0, ldb.Uip_,
 						ldb.Port_, ldb.Tid_, ldb.Cid_, []byte(hash),
 						[]byte(keyRange), []byte(val))

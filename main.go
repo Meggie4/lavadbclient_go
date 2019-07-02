@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"lavadbclient_go/lavadb"
-	"lavadbclient_go/protocols"
+	"log"
 	"math/big"
 	"net"
 	"os"
@@ -13,11 +13,18 @@ import (
 )
 
 func PrintHelpmsg(args []string) {
-	fmt.Printf("%v get keyrange\n", args[0])
-	fmt.Printf("%v set keyrange value\n", args[0])
-	fmt.Printf("%v del keyrange\n", args[0])
-	fmt.Printf("%v delr prefix\n", args[0])
-	fmt.Printf("%v list prefix [marker]\n", args[0])
+	lastIndex := strings.LastIndex(args[0], string('\\'))
+	log.Println("args[0]:", args[0])
+	if lastIndex <= 0 || lastIndex >= len(args[0]) {
+		log.Println("args0 is wrong")
+		return
+	}
+	exe := "./" + args[0][lastIndex + 1:]
+	fmt.Printf("%v get keyrange\n", exe)
+	fmt.Printf("%v set keyrange value\n", exe)
+	fmt.Printf("%v del keyrange\n", exe)
+	fmt.Printf("%v delr prefix\n", exe)
+	fmt.Printf("%v list prefix [marker]\n", exe)
 	fmt.Println("-----------------------------------")
 	fmt.Println("You can set the shell env, such as 'export LAVADB_DEBUG=1', for following variable:")
 	fmt.Printf("\tLAVADB_DEBUG\n")
@@ -39,7 +46,8 @@ func main() {
 	var debug_val, tid_val, cid_val, port_val int64
 	var ip_val, keyhash_val, keyhash_delimiter_val, keyrange string
 	if debug := os.Getenv("LAVADB_DEBUG"); debug != "" {
-		if mydebug, err := strconv.Atoi(debug); err == nil {
+		//fmt.Println("debug is", debug)
+		if mydebug, err := strconv.Atoi(debug); err != nil {
 			fmt.Println("debug error", err)
 			return
 		} else {
@@ -50,7 +58,7 @@ func main() {
 	}
 
 	if tid := os.Getenv("LAVADB_TID"); tid != "" {
-		if mytid, err := strconv.Atoi(tid); err == nil {
+		if mytid, err := strconv.Atoi(tid); err != nil {
 			fmt.Println("tid error", err)
 			return
 		} else {
@@ -61,7 +69,7 @@ func main() {
 	}
 
 	if cid := os.Getenv("LAVADB_CID"); cid != "" {
-		if mycid, err := strconv.Atoi(cid); err == nil {
+		if mycid, err := strconv.Atoi(cid); err != nil {
 			fmt.Println("cid error", err)
 			return
 		} else {
@@ -72,7 +80,7 @@ func main() {
 	}
 
 	if port := os.Getenv("LAVADB_PORT"); port != "" {
-		if myport, err := strconv.Atoi(port); err == nil {
+		if myport, err := strconv.Atoi(port); err != nil {
 			fmt.Println("port error", err)
 			return
 		} else {
@@ -82,18 +90,21 @@ func main() {
 		port_val = 9090
 	}
 
-	if ip_val := os.Getenv("LAVADB_IP"); ip_val == "" {
+	if ip_val = os.Getenv("LAVADB_IP"); ip_val == "" {
 		ip_val = "10.58.90.158"
+		//fmt.Println("ip_val is", ip_val)
 	} 
 
-	if keyhash_val := os.Getenv("LAVADB_KEYHASH"); keyhash_val == "" {
+	if keyhash_val = os.Getenv("LAVADB_KEYHASH"); keyhash_val == "" {
 		keyhash_val = "test_hash"
+		//fmt.Println("keyhash_val is", keyhash_val)
 	} 
 
-	if keyhash_delimiter_val := os.Getenv("LAVADB_KEYHASH_DELIMITER");
+	if keyhash_delimiter_val = os.Getenv("LAVADB_KEYHASH_DELIMITER");
 			keyhash_delimiter_val == "" {
 		keyhash_delimiter_val = "."
-	} 
+		//fmt.Println("keyhash_delimiter is", keyhash_delimiter_val)
+	}
 
 	if len(args) >= 3 {
 		if len(keyhash_delimiter_val) != 0 {
@@ -138,9 +149,9 @@ func main() {
 			return
 		}
 		var val string
-		var rsp = new(lavadb_protocol.RspLavaDBGetRecord)
-		var err error
-		rsp, err = lava.Get(keyrange, keyhash_val)
+		//var rsp = new(lavadb_protocol.RspLavaDBGetRecord)
+		//var err error
+		rsp, err := lava.Get(keyrange, keyhash_val)
 		if err != nil {
 			fmt.Println("get failed,", err)
 			return
@@ -192,14 +203,17 @@ func main() {
 			return
 		}
 		var val string
-		var rsp = new(lavadb_protocol.RspLavaDBSetRecord)
+		//var rsp = new(lavadb_protocol.RspLavaDBSetRecord)
 		val = args[3]
-		var err error
-		rsp, err = lava.Set(keyrange, val, keyhash_val)
+		//var err error
+		rsp, err := lava.Set(keyrange, val, keyhash_val)
 		if err != nil {
 			fmt.Println("set failed,", err)
 			return
 		}
+
+		log.Println("after lava.set, err == nil")
+
 		ret = rsp.Retcode
 		if ret != 0 {
 			retmsg := string(rsp.Retmsg)

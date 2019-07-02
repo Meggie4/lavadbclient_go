@@ -4,8 +4,10 @@
     <list default="true" id="de30e351-b83e-4758-ab48-0fffa01a22d9" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lavadb/lavadb_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/lavadb/lavadb_client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lavadbclient_go.exe" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/protocols/StorageObjectstoreApiReqHelper.go" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/StorageObjectstoreApiReqHelper.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protocols/storage_objectstore_api_pkt.asn" beforeDir="false" afterPath="$PROJECT_DIR$/protocols/storage_objectstore_api_pkt.asn" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -32,20 +34,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="377">
-              <caret line="130" column="31" selection-start-line="130" selection-start-column="31" selection-end-line="130" selection-end-column="31" />
-              <folding>
-                <element signature="e#14#113#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/protocols/StorageObjectstoreApiReqHelper.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="41" lean-forward="true" selection-start-line="41" selection-end-line="41" />
+            <state relative-caret-position="279">
+              <caret line="154" column="18" selection-start-line="154" selection-start-column="18" selection-end-line="154" selection-end-column="18" />
             </state>
           </provider>
         </entry>
@@ -53,16 +43,21 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lavadb/lavadb_client.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="475">
-              <caret line="25" column="21" lean-forward="true" selection-start-line="25" selection-start-column="21" selection-end-line="25" selection-end-column="21" />
+            <state relative-caret-position="456">
+              <caret line="180" column="5" lean-forward="true" selection-start-line="180" selection-start-column="5" selection-end-line="180" selection-end-column="5" />
               <folding>
-                <element signature="e#23#101#0" expanded="true" />
+                <element signature="e#23#194#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>debug e</find>
+    </findStrings>
   </component>
   <component name="GOROOT" path="D:\Go" />
   <component name="Git.Settings">
@@ -75,16 +70,16 @@
         <option value="$PROJECT_DIR$/encoder.go" />
         <option value="$PROJECT_DIR$/storage_objectstore_api_pkt.asn" />
         <option value="$PROJECT_DIR$/lavadb/lavadb_errno.go" />
-        <option value="$PROJECT_DIR$/lavadb/lavadb_client.go" />
         <option value="$PROJECT_DIR$/protocols/StorageObjectstoreApiReqHelper.go" />
+        <option value="$PROJECT_DIR$/lavadb/lavadb_client.go" />
         <option value="$PROJECT_DIR$/main.go" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-8" />
-    <option name="y" value="7" />
-    <option name="width" value="1143" />
+    <option name="x" value="-29" />
+    <option name="y" value="12" />
+    <option name="width" value="1173" />
     <option name="height" value="1049" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -93,6 +88,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -105,16 +101,10 @@
               <item name="lavadbclient_go" type="462c0819:PsiDirectoryNode" />
               <item name="lavadb" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="lavadbclient_go" type="b2602c69:ProjectViewProjectNode" />
-              <item name="lavadbclient_go" type="462c0819:PsiDirectoryNode" />
-              <item name="protocols" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -129,7 +119,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Color Scheme Font" />
+    <property name="settings.editor.selected.configurable" value="Errors" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -168,11 +158,11 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-6" y="6" width="914" height="839" extended-state="0" />
+    <frame x="93" y="35" width="1088" height="828" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17990655" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.496997" visible="true" weight="0.15728155" />
+      <window_info active="true" id="Structure" order="1" sideWeight="0.503003" side_tool="true" visible="true" weight="0.15728155" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
@@ -180,11 +170,11 @@
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" weight="0.3299566" />
+      <window_info anchor="bottom" id="TODO" order="6" visible="true" weight="0.04310345" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="8" />
-      <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info anchor="bottom" id="Terminal" order="10" weight="0.1780029" />
+      <window_info anchor="bottom" id="Version Control" order="9" weight="0.32956153" />
+      <window_info anchor="bottom" id="Terminal" order="10" weight="0.1768034" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -195,18 +185,6 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/main.go</url>
-          <line>2</line>
-          <properties />
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
-  </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/StorageAllPkt.go" />
     <entry file="file://$PROJECT_DIR$/StorageObjectstoreApiPkt.go" />
@@ -215,9 +193,7 @@
     <entry file="file://$PROJECT_DIR$/encoder.go" />
     <entry file="file://$PROJECT_DIR$/storage_objectstore_api_pkt.asn" />
     <entry file="file://$PROJECT_DIR$/storage_all_pkt.asn" />
-    <entry file="file://$PROJECT_DIR$/protocols/storage_objectstore_api_pkt.asn">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
+    <entry file="file://$PROJECT_DIR$/protocols/storage_objectstore_api_pkt.asn" />
     <entry file="file://$PROJECT_DIR$/lavadb/lavadb_errno.go">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -225,59 +201,25 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/protocols/storage_all_pkt.asn">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-282" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/protocols/StorageObjectstoreApiPkt.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="853">
-          <caret line="167" column="32" lean-forward="true" selection-start-line="167" selection-start-column="32" selection-end-line="167" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/protocols/StorageAllPkt.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="95">
-          <caret line="5" column="25" selection-start-line="5" selection-start-column="25" selection-end-line="5" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/protocols/encoder.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="19">
-          <caret line="1" lean-forward="true" selection-start-line="1" selection-end-line="1" />
-          <folding>
-            <element signature="e#25#81#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/protocols/storage_all_pkt.asn" />
+    <entry file="file://$PROJECT_DIR$/protocols/StorageObjectstoreApiPkt.go" />
+    <entry file="file://$PROJECT_DIR$/protocols/StorageAllPkt.go" />
+    <entry file="file://$PROJECT_DIR$/protocols/encoder.go" />
+    <entry file="file://$PROJECT_DIR$/protocols/StorageObjectstoreApiReqHelper.go" />
     <entry file="file://$PROJECT_DIR$/lavadb/lavadb_client.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="475">
-          <caret line="25" column="21" lean-forward="true" selection-start-line="25" selection-start-column="21" selection-end-line="25" selection-end-column="21" />
+        <state relative-caret-position="456">
+          <caret line="180" column="5" lean-forward="true" selection-start-line="180" selection-start-column="5" selection-end-line="180" selection-end-column="5" />
           <folding>
-            <element signature="e#23#101#0" expanded="true" />
+            <element signature="e#23#194#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/protocols/StorageObjectstoreApiReqHelper.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="41" lean-forward="true" selection-start-line="41" selection-end-line="41" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="377">
-          <caret line="130" column="31" selection-start-line="130" selection-start-column="31" selection-end-line="130" selection-end-column="31" />
-          <folding>
-            <element signature="e#14#113#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="279">
+          <caret line="154" column="18" selection-start-line="154" selection-start-column="18" selection-end-line="154" selection-end-column="18" />
         </state>
       </provider>
     </entry>

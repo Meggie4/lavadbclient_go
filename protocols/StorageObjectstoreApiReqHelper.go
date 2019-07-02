@@ -53,7 +53,7 @@ func CheckAsnComplete(data []byte) int64 {
 }
 
 //get dest_key
-func GetSerial(key_hash []byte, key_range []byte) int64 {
+func GetSerial(key_hash []byte, key_range []byte) int32 {
 	var buffer bytes.Buffer
 	buffer.Write(key_hash)
 	buffer.Write(key_range)
@@ -62,7 +62,7 @@ func GetSerial(key_hash []byte, key_range []byte) int64 {
 	md5Ctx.Write(key)
 	cipherStr := md5Ctx.Sum(nil)
 	
-	id := int64(binary.BigEndian.Uint64(cipherStr[4:13]))
+	id := int32(binary.BigEndian.Uint32(cipherStr[4:13]))
 	return id
 }
 
@@ -75,6 +75,7 @@ func GetRouteinfo(
 	remoteid   *int64) ROUTEINFO {
 	var route ROUTEINFO
 	route.Srcid = *srcid
+	route.Version = VERSION
 	if dest_id != nil {
 		route.Destid = *dest_id
 		route.Desttype = ROUTE_DEST_ID
@@ -107,7 +108,7 @@ func GetReqLavaDBSetRecord(
 	key_hash []byte,
 	key_range []byte,
 	value []byte) {
-	dest_key := GetSerial(key_hash, key_range)
+	dest_key := (int64)(GetSerial(key_hash, key_range))
 	route_info := GetRouteinfo(&smcd_id, nil, &dest_key,
 					&dest_ip, &dest_port, nil)
 	*out_msg = StorageMessage{
@@ -117,7 +118,7 @@ func GetReqLavaDBSetRecord(
 		Msgtype:   0,
 		Body: OBJECTSTOREPkt{
 			Version:  VERSION,
-			Echodata: []byte("hello"),
+			Echodata: []byte(""),
 			Body: ReqLavaDBSetRecord{
 				Dbid:      dbid,
 				Tableid:   tableid,
@@ -144,7 +145,7 @@ func GetReqLavaDBSetVerRecord(
 	value []byte,
 	ver   []byte,
 	add_flag  int64) {
-	dest_key := GetSerial(key_hash, key_range)
+	dest_key := (int64)(GetSerial(key_hash, key_range))
 	route_info := GetRouteinfo(&smcd_id, nil, &dest_key,
 					&dest_ip, &dest_port, nil)
 	*out_msg = StorageMessage{
@@ -154,7 +155,7 @@ func GetReqLavaDBSetVerRecord(
 		Msgtype:   0,
 		Body: OBJECTSTOREPkt{
 			Version:  VERSION,
-			Echodata: []byte("hello"),
+			Echodata: []byte(""),
 			Body: ReqLavaDBSetVerRecord{
 				Dbid:      dbid,
 				Tableid:   tableid,
@@ -180,7 +181,7 @@ func GetReqLavaDBGetRecord(
 	tableid int64,
 	key_hash []byte,
 	key_range []byte) {
-	dest_key := GetSerial(key_hash, key_range)
+	dest_key := (int64)(GetSerial(key_hash, key_range))
 	route_info := GetRouteinfo(&smcd_id, nil, &dest_key,
 						&dest_ip, &dest_port, nil)
 	*out_msg = StorageMessage{
@@ -190,7 +191,7 @@ func GetReqLavaDBGetRecord(
 		Msgtype:   0,
 		Body: OBJECTSTOREPkt{
 			Version:  VERSION,
-			Echodata: []byte("hello"),
+			Echodata: []byte(""),
 			Body: ReqLavaDBGetRecord{
 				Dbid:      dbid,
 				Tableid:   tableid,
@@ -212,7 +213,7 @@ func GetReqLavaDBDelRecord(
 	tableid int64,
 	key_hash []byte,
 	key_range []byte) {
-	dest_key := GetSerial(key_hash, key_range)
+	dest_key := (int64)(GetSerial(key_hash, key_range))
 	route_info := GetRouteinfo(&smcd_id, nil, &dest_key,
 					&dest_ip, &dest_port, nil)
 	*out_msg = StorageMessage{
@@ -222,7 +223,7 @@ func GetReqLavaDBDelRecord(
 		Msgtype:   0,
 		Body: OBJECTSTOREPkt{
 			Version:  VERSION,
-			Echodata: []byte("hello"),
+			Echodata: []byte(""),
 			Body: ReqLavaDBDelRecord{
 				Dbid:      dbid,
 				Tableid:   tableid,
@@ -245,7 +246,7 @@ func GetReqLavaDBDelVerRecord(
 	key_hash []byte,
 	key_range []byte,
 	ver 	 []byte) {
-	dest_key := GetSerial(key_hash, key_range)
+	dest_key := (int64)(GetSerial(key_hash, key_range))
 	route_info := GetRouteinfo(&smcd_id, nil, &dest_key,
 				&dest_ip, &dest_port, nil)
 	*out_msg = StorageMessage{
@@ -255,7 +256,7 @@ func GetReqLavaDBDelVerRecord(
 		Msgtype:   0,
 		Body: OBJECTSTOREPkt{
 			Version:  VERSION,
-			Echodata: []byte("hello"),
+			Echodata: []byte(""),
 			Body: ReqLavaDBDelVerRecord{
 				Dbid:      dbid,
 				Tableid:   tableid,
@@ -284,7 +285,7 @@ func GetReqLavaDBListRecord(
 	value_size   int64,
 	maxnum       int64,
 	thetype      int64) {
-	dest_key := GetSerial(key_hash, prefix)
+	dest_key := (int64)(GetSerial(key_hash, prefix))
 	route_info := GetRouteinfo(&smcd_id, nil, &dest_key,
 					&dest_ip, &dest_port, nil)
 	*out_msg = StorageMessage{
@@ -294,7 +295,7 @@ func GetReqLavaDBListRecord(
 		Msgtype:   0,
 		Body: OBJECTSTOREPkt{
 			Version:  VERSION,
-			Echodata: []byte("hello"),
+			Echodata: []byte(""),
 			Body: ReqLavaDBListRecord{
 				Dbid:      dbid,
 				Tableid:   tableid,
